@@ -67,7 +67,27 @@ def clarify(messagetext):
     _clarify(message, messagetext)
     return message.as_string()
 
+def verify(text):
+    '''Pipe to gpg for verification and exit'''
+    import subprocess
+    process=subprocess.Popen(['/usr/bin/env', 'gpg','--verify','--batch'],stdin=subprocess.PIPE)
+    process.communicate(text)
+    process.wait()
+    # preserve the gpg error code
+    sys.exit(process.returncode)
 
 if __name__ == '__main__':
-    import sys
-    sys.stdout.write(clarify(sys.stdin.read()))
+    import sys,argparse
+    parser=argparse.ArgumentParser(
+        description='Convert a PGP/MIME signed email to a clearsigned message.  If no file is given, input is read from stdin.')
+    parser.add_argument('file',metavar='file',type=argparse.FileType('r'),
+        nargs="?",default=sys.stdin,help='a file containing the whole MIME email')
+    parser.add_argument('-v','--verify',help="pass output to gpg to verify signature",
+        action='store_true')
+    args=parser.parse_args()
+    output = (clarify(args.file.read()))
+    if args.verify:
+        verify(output)
+    else:
+        sys.stdout.write(output)
+
