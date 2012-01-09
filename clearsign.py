@@ -76,17 +76,33 @@ def verify(text):
     # preserve the gpg error code
     sys.exit(process.returncode)
 
-if __name__ == '__main__':
-    import sys,argparse
+
+def parse_args():
+    try:
+        import argparse
+    except:
+        if len(sys.argv)>1:
+            sys.exit("""Error: Cannot accept argments. 
+
+Please input a MIME message on stdin.
+Example: clearsign.py < foo.txt""")
+        else:
+            return {'file': sys.stdin,'verify': False}
+
     parser=argparse.ArgumentParser(
         description='Convert a PGP/MIME signed email to a clearsigned message.  If no file is given, input is read from stdin.')
     parser.add_argument('file',metavar='file',type=argparse.FileType('r'),
         nargs="?",default=sys.stdin,help='a file containing the whole MIME email')
     parser.add_argument('-v','--verify',help="pass output to gpg to verify signature",
         action='store_true')
-    args=parser.parse_args()
-    output = (clarify(args.file.read()))
-    if args.verify:
+    return vars(parser.parse_args())
+ 
+
+if __name__ == '__main__':
+    import sys
+    args=parse_args()
+    output = (clarify(args['file'].read()))
+    if args['verify']:
         verify(output)
     else:
         sys.stdout.write(output)

@@ -18,8 +18,3 @@ to a clearsigned message.
 The script was originally written by Lenny Domnitser but is no longer
 maintained. Nathan Grigg wrote a tiny bug fix and enriched the command
 line interface.
-
-# To do 
-
-- Allow basic operation on systems without the argparse module
-
