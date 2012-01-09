@@ -32,6 +32,8 @@ NotDashEscaped: You need GnuPG to verify this message
 def _clarify(message, messagetext):
     if message.get_content_type() == 'multipart/signed':
         if message.get_param('protocol') == 'application/pgp-signature':
+            # normalize line endings to \n for processing
+            messagetext=messagetext.replace('\r\n', '\n').replace('\r', '\n')
             hashname = message.get_param('micalg').upper()
             assert hashname.startswith('PGP-')
             hashname = hashname.replace('PGP-', '', 1)
